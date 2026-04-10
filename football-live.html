@@ -1,360 +1,527 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>KICKOFF — Live Football</title>
-  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
-  <style>
-    :root {
-      --red:        #e8151b;
-      --red-dim:    rgba(232,21,27,0.08);
-      --red-border: rgba(232,21,27,0.25);
-      --bg:         #ffffff;
-      --surface:    #f9f9f9;
-      --surface2:   #f0f0f0;
-      --border:     #e0e0e0;
-      --text:       #111111;
-      --muted:      #888888;
-      --muted2:     #cccccc;
-      --green:      #e8151b;
-    }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>KICKOFF — Live Football</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --pitch:   #00C853;
+  --pitch-d: #00962f;
+  --red:     #FF3333;
+  --amber:   #FFB800;
+  --bg:      #0a0a0f;
+  --bg2:     #111118;
+  --bg3:     #18181f;
+  --card:    #1c1c25;
+  --card2:   #222230;
+  --border:  rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text:    #f0f0f0;
+  --muted:   #888;
+  --muted2:  #555;
+}
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
 
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Inter', sans-serif;
-      min-height: 100vh;
-      overflow-x: hidden;
-      font-size: 14px;
-      line-height: 1.5;
-    }
+html { scroll-behavior: smooth; }
 
-    /* ══ HEADER ══ */
-    header {
-      position: sticky; top: 0; z-index: 200;
-      height: 66px;
-      background: #ffffff;
-      border-bottom: 2px solid var(--red);
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 32px; gap: 20px;
-    }
-    .logo {
-      font-family: 'Oswald', sans-serif;
-      font-size: 28px; font-weight: 700;
-      letter-spacing: 0.08em; color: #111111; flex-shrink: 0;
-    }
-    .logo em { color: var(--red); font-style: normal; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  font-size: 14px;
+}
 
-    nav { display: flex; gap: 4px; }
-    .nav-btn {
-      font-family: 'Oswald', sans-serif;
-      font-size: 13px; font-weight: 500;
-      letter-spacing: 0.1em; text-transform: uppercase;
-      background: none; border: none; cursor: pointer;
-      color: var(--muted); padding: 8px 18px;
-      border-radius: 4px; transition: all 0.18s;
-    }
-    .nav-btn:hover { color: #111; background: var(--surface2); }
-    .nav-btn.active { color: var(--red); background: var(--red-dim); }
+/* ── scrollbar ── */
+::-webkit-scrollbar { width:6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--bg3); border-radius:3px; }
 
-    .live-pill {
-      display: flex; align-items: center; gap: 7px;
-      background: var(--red); color: #fff;
-      font-family: 'Oswald', sans-serif;
-      font-size: 12px; font-weight: 600; letter-spacing: 0.18em;
-      padding: 6px 14px; border-radius: 3px; flex-shrink: 0;
-    }
-    .pulse-dot {
-      width: 7px; height: 7px; border-radius: 50%; background: #fff;
-      animation: blink 1.1s ease-in-out infinite;
-    }
-    @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.2;} }
+/* ── noise overlay ── */
+body::before {
+  content:'';
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  opacity:.4;
+}
 
-    /* ══ HERO ══ */
-    .hero {
-      background: #fff;
-      border-bottom: 1px solid var(--border);
-      padding: 52px 32px 44px;
-      position: relative; overflow: hidden;
-    }
-    .hero::after {
-      content: '';
-      position: absolute; right: 0; top: 0; bottom: 0; width: 55%;
-      background: radial-gradient(ellipse at 80% 50%, rgba(232,21,27,0.08) 0%, transparent 65%);
-      pointer-events: none;
-    }
-    .hero-eyebrow {
-      font-family: 'Oswald', sans-serif;
-      font-size: 11px; font-weight: 500;
-      letter-spacing: 0.28em; text-transform: uppercase;
-      color: var(--red); margin-bottom: 16px;
-      display: flex; align-items: center; gap: 10px;
-    }
-    .hero-eyebrow::after {
-      content: ''; width: 48px; height: 1px;
-      background: var(--red); opacity: 0.45;
-    }
-    .hero h1 {
-      font-family: 'Oswald', sans-serif;
-      font-size: clamp(40px, 5.5vw, 70px);
-      font-weight: 700; line-height: 1.0;
-      letter-spacing: 0.02em; color: #111; margin-bottom: 14px;
-    }
-    .hero h1 span { color: var(--red); }
-    .hero p {
-      font-size: 15px; font-weight: 300;
-      color: var(--muted); max-width: 460px; line-height: 1.65;
-    }
+/* ═══════════ HEADER ═══════════ */
+header {
+  position:sticky; top:0; z-index:300;
+  height:62px;
+  background: rgba(10,10,15,0.88);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom:1px solid var(--border2);
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 28px;
+}
 
-    /* ══ LAYOUT ══ */
-    .page {
-      max-width: 1180px; margin: 0 auto; padding: 32px;
-      display: grid; grid-template-columns: 1fr 296px; gap: 28px;
-    }
+.logo {
+  font-family:'Bebas Neue', sans-serif;
+  font-size:32px; letter-spacing:.14em;
+  color:#fff;
+  display:flex; align-items:center; gap:0;
+}
+.logo em { color:var(--pitch); font-style:normal; }
+.logo-dot {
+  width:8px; height:8px; border-radius:50%;
+  background:var(--pitch); margin-left:5px; margin-top:2px;
+  animation: pulse-dot 1.6s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+  0%,100%{ box-shadow:0 0 0 0 rgba(0,200,83,.6); }
+  50%    { box-shadow:0 0 0 8px rgba(0,200,83,0); }
+}
 
-    /* ══ SEARCH ══ */
-    .search-section {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 12px; padding: 20px; margin-bottom: 24px;
-    }
-    .search-title {
-      font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 600;
-      letter-spacing: 0.12em; text-transform: uppercase;
-      color: var(--muted); margin-bottom: 12px;
-    }
-    .search-row {
-      display: flex; gap: 10px; align-items: center;
-    }
-    .search-bar {
-      display: flex; align-items: center; gap: 12px;
-      background: #fff; border: 1.5px solid var(--border);
-      border-radius: 8px; padding: 12px 18px; flex: 1;
-      transition: border-color 0.2s;
-    }
-    .search-bar:focus-within { border-color: var(--red); }
-    .search-bar input {
-      background: none; border: none; outline: none;
-      color: #111; font-family: 'Inter', sans-serif; font-size: 14px; width: 100%;
-    }
-    .search-bar input::placeholder { color: var(--muted); }
-    .search-bar svg { color: var(--muted); flex-shrink: 0; }
-    .search-type-btns { display: flex; gap: 6px; }
-    .search-type-btn {
-      font-family: 'Oswald', sans-serif; font-size: 11px; font-weight: 600;
-      letter-spacing: 0.1em; text-transform: uppercase;
-      background: var(--surface2); border: 1px solid var(--border);
-      border-radius: 6px; cursor: pointer; color: var(--muted);
-      padding: 8px 16px; transition: all 0.18s; white-space: nowrap;
-    }
-    .search-type-btn:hover { color: #111; border-color: #bbb; }
-    .search-type-btn.active { background: var(--red); color: #fff; border-color: var(--red); }
-    .search-btn {
-      font-family: 'Oswald', sans-serif; font-size: 12px; font-weight: 600;
-      letter-spacing: 0.1em; text-transform: uppercase;
-      background: var(--red); color: #fff; border: none;
-      border-radius: 8px; cursor: pointer; padding: 12px 22px;
-      transition: opacity 0.18s; white-space: nowrap;
-    }
-    .search-btn:hover { opacity: 0.88; }
-    .search-hint {
-      font-size: 11px; color: var(--muted); margin-top: 10px;
-    }
+.nav {
+  display:flex; align-items:center; gap:2px;
+  background: var(--bg3);
+  border:1px solid var(--border);
+  border-radius:8px; padding:3px;
+}
+.nav-btn {
+  font-family:'DM Sans', sans-serif;
+  font-size:12px; font-weight:600; letter-spacing:.07em; text-transform:uppercase;
+  background:none; border:none; cursor:pointer;
+  color:var(--muted); padding:7px 18px; border-radius:6px;
+  transition: all .2s;
+}
+.nav-btn:hover  { color:#fff; }
+.nav-btn.active { background:var(--card2); color:#fff; }
 
-    /* ══ TABS ══ */
-    .tabs { display: flex; gap: 6px; margin-bottom: 22px; }
-    .tab {
-      font-family: 'Oswald', sans-serif;
-      font-size: 12px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 5px; cursor: pointer; color: var(--muted);
-      padding: 8px 20px; transition: all 0.18s;
-    }
-    .tab:hover { color: #111; border-color: var(--muted2); }
-    .tab.active { background: var(--red); color: #fff; border-color: var(--red); }
+.header-right { display:flex; align-items:center; gap:12px; }
+.api-badge {
+  font-family:'JetBrains Mono', monospace;
+  font-size:10px; font-weight:600;
+  color:var(--pitch); background:rgba(0,200,83,.1);
+  border:1px solid rgba(0,200,83,.25);
+  padding:5px 11px; border-radius:4px; letter-spacing:.06em;
+}
 
-    /* ══ SECTION HDR ══ */
-    .section-hd {
-      font-family: 'Oswald', sans-serif;
-      font-size: 18px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
-      margin-bottom: 16px; display: flex; align-items: center; gap: 10px; color: #111;
-    }
-    .count-badge {
-      font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600;
-      background: var(--surface2); color: var(--muted); padding: 2px 9px; border-radius: 20px;
-    }
+/* ═══════════ HERO ═══════════ */
+.hero {
+  position:relative; overflow:hidden;
+  padding:64px 28px 52px;
+  border-bottom:1px solid var(--border);
+}
+.hero-glow {
+  position:absolute; top:-120px; left:-80px;
+  width:600px; height:400px; border-radius:50%;
+  background: radial-gradient(ellipse, rgba(0,200,83,.14) 0%, transparent 65%);
+  pointer-events:none;
+}
+.hero-glow2 {
+  position:absolute; bottom:-80px; right:-40px;
+  width:400px; height:300px; border-radius:50%;
+  background: radial-gradient(ellipse, rgba(255,51,51,.1) 0%, transparent 65%);
+  pointer-events:none;
+}
+.hero-inner { position:relative; z-index:1; max-width:1180px; margin:0 auto; }
+.hero-eyebrow {
+  font-family:'JetBrains Mono', monospace;
+  font-size:10px; font-weight:600; letter-spacing:.22em; text-transform:uppercase;
+  color:var(--pitch); margin-bottom:20px;
+  display:flex; align-items:center; gap:10px;
+}
+.hero-eyebrow::before {
+  content:''; width:32px; height:1px; background:var(--pitch); opacity:.5;
+}
+.hero h1 {
+  font-family:'Bebas Neue', sans-serif;
+  font-size:clamp(52px, 8vw, 100px);
+  line-height:.92; letter-spacing:.04em; color:#fff;
+  margin-bottom:18px;
+}
+.hero h1 .green { color:var(--pitch); }
+.hero h1 .stroke {
+  -webkit-text-stroke:1.5px rgba(255,255,255,.25);
+  color:transparent;
+}
+.hero-sub {
+  font-size:15px; font-weight:300; color:var(--muted);
+  max-width:460px; line-height:1.7;
+}
+.hero-stats {
+  display:flex; gap:28px; margin-top:36px; flex-wrap:wrap;
+}
+.hero-stat {
+  display:flex; flex-direction:column; gap:4px;
+}
+.hero-stat-num {
+  font-family:'Bebas Neue', sans-serif;
+  font-size:32px; color:#fff; letter-spacing:.04em; line-height:1;
+}
+.hero-stat-num span { color:var(--pitch); font-size:18px; }
+.hero-stat-lbl {
+  font-size:10px; font-weight:600; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--muted);
+}
+.hero-divider {
+  width:1px; height:48px; background:var(--border2);
+  align-self:center;
+}
 
-    /* ══ MATCH CARD ══ */
-    .match-card {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 10px; padding: 18px 20px; margin-bottom: 10px;
-      cursor: pointer; transition: all 0.22s ease;
-      animation: slideUp 0.35s ease both; position: relative;
-    }
-    @keyframes slideUp {
-      from { opacity:0; transform:translateY(10px); }
-      to   { opacity:1; transform:translateY(0); }
-    }
-    .match-card:hover {
-      border-color: var(--red); background: var(--surface2);
-      transform: translateY(-2px); box-shadow: 0 6px 28px rgba(232,21,27,0.1);
-    }
-    .match-card.is-live { border-left: 3px solid var(--red); }
+/* ═══════════ LAYOUT ═══════════ */
+.page {
+  max-width:1180px; margin:0 auto;
+  display:grid; grid-template-columns:1fr 300px;
+  gap:24px; padding:28px;
+}
 
-    .card-league {
-      font-family: 'Inter', sans-serif;
-      font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
-      color: var(--muted); display: flex; align-items: center; gap: 7px; margin-bottom: 14px; flex-wrap: wrap;
-    }
-    .card-league img { width: 16px; height: 16px; border-radius: 50%; object-fit: contain; background: var(--surface2); }
+/* ═══════════ SEARCH ═══════════ */
+.search-section {
+  margin-bottom:24px;
+  background: var(--card);
+  border:1px solid var(--border);
+  border-radius:12px; padding:20px;
+}
+.search-label {
+  font-family:'JetBrains Mono', monospace;
+  font-size:9px; font-weight:600; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--muted2); margin-bottom:14px;
+}
+.search-types {
+  display:flex; gap:6px; margin-bottom:14px;
+}
+.stype-btn {
+  font-size:11px; font-weight:600; letter-spacing:.08em;
+  background:var(--bg3); border:1px solid var(--border);
+  border-radius:6px; cursor:pointer; color:var(--muted);
+  padding:7px 16px; transition:all .18s;
+}
+.stype-btn:hover { color:#fff; border-color:var(--border2); }
+.stype-btn.active { background:var(--pitch); color:#000; border-color:var(--pitch); }
+.search-row { display:flex; gap:8px; }
+.search-input-wrap {
+  flex:1; display:flex; align-items:center; gap:10px;
+  background: var(--bg); border:1px solid var(--border2);
+  border-radius:8px; padding:11px 16px; transition:border-color .2s;
+}
+.search-input-wrap:focus-within { border-color: var(--pitch); }
+.search-input-wrap svg { color:var(--muted); flex-shrink:0; }
+.search-input-wrap input {
+  background:none; border:none; outline:none;
+  color:#fff; font-family:'DM Sans', sans-serif; font-size:14px; width:100%;
+}
+.search-input-wrap input::placeholder { color:var(--muted2); }
+.search-go {
+  background:var(--pitch); color:#000;
+  font-family:'DM Sans', sans-serif; font-size:12px; font-weight:700; letter-spacing:.06em;
+  border:none; border-radius:8px; cursor:pointer;
+  padding:11px 22px; transition:opacity .18s; white-space:nowrap;
+}
+.search-go:hover { opacity:.85; }
 
-    .card-body { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; }
-    .team-block { display: flex; flex-direction: column; gap: 6px; }
-    .team-block.right { align-items: flex-end; text-align: right; }
+/* ═══════════ TABS ═══════════ */
+.tabs {
+  display:flex; gap:4px;
+  background:var(--bg3); border:1px solid var(--border);
+  border-radius:10px; padding:4px; margin-bottom:20px;
+  width:fit-content;
+}
+.tab {
+  font-size:12px; font-weight:600; letter-spacing:.07em; text-transform:uppercase;
+  background:none; border:none; cursor:pointer; color:var(--muted);
+  padding:8px 22px; border-radius:7px; transition:all .2s;
+}
+.tab:hover { color:#fff; }
+.tab.active { background:var(--card2); color:#fff; }
 
-    .team-logo { width: 32px; height: 32px; border-radius: 50%; object-fit: contain; background: var(--surface2); }
-    .team-logo-ph {
-      width: 32px; height: 32px; border-radius: 50%; background: var(--surface2);
-      display: flex; align-items: center; justify-content: center;
-      font-family: 'Oswald', sans-serif; font-size: 11px; color: var(--muted);
-    }
-    .team-name { font-family: 'Oswald', sans-serif; font-size: 15px; font-weight: 600; color: #111; }
+/* ═══════════ SECTION HEAD ═══════════ */
+.section-hd {
+  font-family:'Bebas Neue', sans-serif;
+  font-size:22px; letter-spacing:.08em; color:#fff;
+  margin-bottom:16px; display:flex; align-items:center; gap:10px;
+}
+.count-pill {
+  font-family:'JetBrains Mono', monospace;
+  font-size:10px; font-weight:600;
+  background:var(--bg3); color:var(--muted);
+  border:1px solid var(--border); padding:3px 10px; border-radius:20px;
+}
 
-    .score-col { text-align: center; }
-    .score-num {
-      font-family: 'Oswald', sans-serif; font-size: 30px; font-weight: 700;
-      color: #111; letter-spacing: 0.04em; line-height: 1;
-    }
-    .score-num.live-score { color: var(--red); }
-    .match-status {
-      font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600;
-      letter-spacing: 0.1em; margin-top: 5px;
-    }
-    .match-status.live { color: var(--red); }
-    .match-status.ns   { color: var(--muted); }
-    .match-status.ft   { color: var(--muted); }
+/* ═══════════ MATCH CARD ═══════════ */
+.match-card {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:12px; padding:20px;
+  margin-bottom:10px; cursor:pointer;
+  transition:all .25s ease; position:relative; overflow:hidden;
+  animation: fadeUp .4s ease both;
+}
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(12px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.match-card::before {
+  content:''; position:absolute; inset:0; border-radius:12px;
+  background:linear-gradient(135deg, rgba(255,255,255,.02) 0%, transparent 60%);
+  pointer-events:none;
+}
+.match-card:hover {
+  border-color:rgba(0,200,83,.35);
+  background:var(--card2);
+  transform:translateY(-2px);
+  box-shadow:0 12px 40px rgba(0,0,0,.4), 0 0 0 1px rgba(0,200,83,.15);
+}
+.match-card.is-live {
+  border-color:rgba(255,51,51,.3);
+}
+.match-card.is-live::after {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background:linear-gradient(90deg, var(--red), transparent);
+  border-radius:12px 12px 0 0;
+}
 
-    .live-tag {
-      display: inline-flex; align-items: center; gap: 5px;
-      background: var(--red-dim); color: var(--red);
-      font-family: 'Oswald', sans-serif; font-size: 10px; font-weight: 600;
-      letter-spacing: 0.14em; padding: 2px 8px; border-radius: 3px;
-    }
-    .live-tag span {
-      width: 6px; height: 6px; border-radius: 50%; background: var(--red);
-      display: inline-block; animation: blink 1.1s infinite;
-    }
+.card-meta {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:16px; flex-wrap:wrap; gap:8px;
+}
+.card-league {
+  font-size:10px; font-weight:600; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--muted); display:flex; align-items:center; gap:7px;
+}
+.card-league img { width:14px; height:14px; border-radius:50%; background:var(--bg3); }
+.live-chip {
+  display:flex; align-items:center; gap:5px;
+  background:rgba(255,51,51,.15); border:1px solid rgba(255,51,51,.3);
+  color:var(--red); font-size:9px; font-weight:700; letter-spacing:.16em;
+  padding:3px 9px; border-radius:4px;
+}
+.live-chip .dot {
+  width:5px; height:5px; border-radius:50%; background:var(--red);
+  animation: blink 1.2s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1;} 50%{opacity:.2;} }
 
-    /* ══ PLAYER CARD ══ */
-    .player-card {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 10px; padding: 14px 18px; margin-bottom: 8px;
-      display: flex; align-items: center; gap: 14px;
-      animation: slideUp 0.3s ease both; transition: all 0.18s;
-    }
-    .player-card:hover { border-color: var(--red); background: var(--surface2); }
-    .player-avatar {
-      width: 46px; height: 46px; border-radius: 50%;
-      background: var(--surface2); border: 2px solid var(--border);
-      display: flex; align-items: center; justify-content: center;
-      font-family: 'Oswald', sans-serif; font-size: 15px; color: var(--red);
-      flex-shrink: 0; overflow: hidden;
-    }
-    .player-avatar img { width: 100%; height: 100%; object-fit: cover; }
-    .player-name {
-      font-family: 'Oswald', sans-serif; font-size: 16px; font-weight: 600;
-      color: #111; margin-bottom: 4px;
-    }
-    .player-meta { font-size: 12px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 10px; }
-    .pos-tag {
-      font-family: 'Oswald', sans-serif; font-size: 10px; font-weight: 600;
-      letter-spacing: 0.1em; text-transform: uppercase;
-      background: var(--red-dim); color: var(--red);
-      padding: 3px 10px; border-radius: 3px; flex-shrink: 0; align-self: center;
-    }
+.card-body { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:16px; }
+.team-block { display:flex; flex-direction:column; gap:8px; }
+.team-block.right { align-items:flex-end; text-align:right; }
 
-    /* ══ SIDEBAR ══ */
-    .sidebar-card {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 10px; padding: 20px; margin-bottom: 16px;
-    }
-    .sidebar-title {
-      font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 600;
-      letter-spacing: 0.1em; text-transform: uppercase;
-      color: var(--red); margin-bottom: 16px;
-    }
-    .stat-row {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 13px;
-    }
-    .stat-row:last-child { border-bottom: none; padding-bottom: 0; }
-    .stat-label { color: var(--muted); font-weight: 400; }
-    .stat-val { font-family: 'Oswald', sans-serif; font-size: 15px; font-weight: 600; color: #111; }
-    .stat-val.red   { color: var(--red); }
-    .stat-val.green { color: var(--green); }
+.team-logo {
+  width:36px; height:36px; border-radius:8px;
+  object-fit:contain; background:var(--bg3);
+}
+.team-logo-ph {
+  width:36px; height:36px; border-radius:8px; background:var(--bg3);
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Bebas Neue', sans-serif; font-size:13px; color:var(--muted);
+}
+.team-name {
+  font-family:'DM Sans', sans-serif; font-size:14px; font-weight:600; color:#fff;
+  line-height:1.2;
+}
 
-    /* ══ STATES ══ */
-    .loading {
-      display: flex; flex-direction: column; align-items: center;
-      justify-content: center; gap: 14px; padding: 64px;
-      color: var(--muted); font-size: 13px;
-    }
-    .spinner {
-      width: 34px; height: 34px; border-radius: 50%;
-      border: 2px solid var(--border); border-top-color: var(--red);
-      animation: spin 0.75s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
+.score-box { text-align:center; }
+.score {
+  font-family:'Bebas Neue', sans-serif;
+  font-size:36px; letter-spacing:.08em; line-height:1;
+  color:#fff;
+}
+.score.live { color:var(--red); }
+.score-vs {
+  font-family:'JetBrains Mono', monospace;
+  font-size:14px; color:var(--muted2);
+}
+.match-status {
+  font-family:'JetBrains Mono', monospace;
+  font-size:10px; font-weight:600; letter-spacing:.1em;
+  margin-top:5px;
+}
+.match-status.live   { color:var(--red); }
+.match-status.ns     { color:var(--muted); }
+.match-status.ft     { color:var(--muted2); }
 
-    .empty-state {
-      text-align: center; padding: 60px 20px; color: var(--muted);
-    }
-    .empty-state .icon { font-size: 36px; margin-bottom: 14px; }
-    .empty-state p { font-size: 14px; line-height: 1.6; }
+/* ═══════════ PLAYER CARD ═══════════ */
+.player-card {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:12px; padding:16px 18px;
+  display:flex; align-items:center; gap:14px;
+  margin-bottom:8px;
+  animation:fadeUp .3s ease both;
+  transition:all .2s;
+}
+.player-card:hover {
+  border-color:rgba(0,200,83,.3);
+  background:var(--card2);
+  transform:translateX(3px);
+}
+.avatar {
+  width:44px; height:44px; border-radius:10px; flex-shrink:0;
+  background:var(--bg3); border:1px solid var(--border2);
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Bebas Neue', sans-serif; font-size:14px; color:var(--pitch);
+  overflow:hidden;
+}
+.avatar img { width:100%; height:100%; object-fit:cover; }
+.player-name {
+  font-size:15px; font-weight:600; color:#fff; margin-bottom:5px;
+}
+.player-meta {
+  font-size:11px; color:var(--muted); display:flex; flex-wrap:wrap; gap:10px;
+}
+.pos-tag {
+  font-family:'JetBrains Mono', monospace;
+  font-size:9px; font-weight:600; letter-spacing:.1em; text-transform:uppercase;
+  background:rgba(0,200,83,.12); color:var(--pitch);
+  border:1px solid rgba(0,200,83,.2);
+  padding:4px 10px; border-radius:4px; align-self:center; flex-shrink:0;
+}
 
-    .error-msg {
-      background: rgba(232,21,27,0.07); border: 1px solid var(--red-border);
-      border-radius: 8px; padding: 16px 18px; color: #f87171;
-      font-size: 13px; line-height: 1.6; margin-bottom: 16px;
-    }
-    .demo-label {
-      font-family: 'Oswald', sans-serif; font-size: 11px; font-weight: 500;
-      letter-spacing: 0.14em; text-transform: uppercase;
-      color: var(--muted2); margin: 20px 0 10px;
-      display: flex; align-items: center; gap: 10px;
-    }
-    .demo-label::before, .demo-label::after {
-      content: ''; flex: 1; height: 1px; background: var(--border);
-    }
+/* ═══════════ SIDEBAR ═══════════ */
+.sidebar-card {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:12px; padding:20px; margin-bottom:14px;
+  position:relative; overflow:hidden;
+}
+.sidebar-card::before {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(135deg, rgba(255,255,255,.02) 0%, transparent 50%);
+  pointer-events:none;
+}
+.sb-title {
+  font-family:'Bebas Neue', sans-serif;
+  font-size:16px; letter-spacing:.1em; color:var(--pitch);
+  margin-bottom:16px; display:flex; align-items:center; gap:8px;
+}
+.stat-row {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:10px 0; border-bottom:1px solid var(--border); font-size:12px;
+}
+.stat-row:last-child { border-bottom:none; padding-bottom:0; }
+.stat-lbl { color:var(--muted); }
+.stat-val {
+  font-family:'JetBrains Mono', monospace;
+  font-size:13px; font-weight:600; color:#fff;
+}
+.stat-val.green { color:var(--pitch); }
+.stat-val.red   { color:var(--red); }
+.stat-val.amber { color:var(--amber); }
 
-    @media (max-width: 820px) {
-      .page { grid-template-columns: 1fr; }
-      .sidebar { display: none; }
-      header { padding: 0 16px; }
-      .hero { padding: 36px 16px 32px; }
-      .page { padding: 16px; }
-    }
-  </style>
+/* ═══════════ LEAGUE PILL ═══════════ */
+.league-row {
+  display:flex; align-items:center; gap:10px;
+  padding:9px 0; border-bottom:1px solid var(--border);
+  cursor:pointer; transition:opacity .18s;
+}
+.league-row:last-child { border-bottom:none; padding-bottom:0; }
+.league-row:hover { opacity:.8; }
+.league-flag { font-size:16px; }
+.league-name { font-size:12px; color:var(--text); flex:1; }
+.league-badge {
+  font-family:'JetBrains Mono', monospace;
+  font-size:9px; color:var(--muted); letter-spacing:.06em;
+}
+
+/* ═══════════ STATES ═══════════ */
+.loading {
+  display:flex; flex-direction:column; align-items:center;
+  justify-content:center; gap:16px; padding:60px;
+  color:var(--muted); font-size:12px; letter-spacing:.06em;
+}
+.spinner {
+  width:32px; height:32px; border-radius:50%;
+  border:2px solid var(--border2); border-top-color:var(--pitch);
+  animation:spin .7s linear infinite;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+
+.empty-state {
+  text-align:center; padding:56px 20px; color:var(--muted);
+}
+.empty-icon { font-size:40px; margin-bottom:16px; }
+.empty-state p { font-size:13px; line-height:1.7; }
+
+.error-box {
+  background:rgba(255,51,51,.07); border:1px solid rgba(255,51,51,.2);
+  border-radius:8px; padding:16px 18px; color:#f87171;
+  font-size:12px; line-height:1.7; margin-bottom:12px;
+}
+.demo-sep {
+  font-family:'JetBrains Mono', monospace;
+  font-size:9px; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--muted2); margin:20px 0 12px;
+  display:flex; align-items:center; gap:10px;
+}
+.demo-sep::before, .demo-sep::after {
+  content:''; flex:1; height:1px; background:var(--border);
+}
+
+/* ═══════════ STANDING TABLE ═══════════ */
+.standing-table { width:100%; border-collapse:collapse; font-size:12px; }
+.standing-table th {
+  font-family:'JetBrains Mono', monospace;
+  font-size:9px; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--muted2); padding:6px 8px; text-align:center;
+  border-bottom:1px solid var(--border);
+}
+.standing-table th:first-child { text-align:left; }
+.standing-table td { padding:9px 8px; text-align:center; border-bottom:1px solid rgba(255,255,255,.04); }
+.standing-table td:first-child { text-align:left; }
+.standing-table tr:last-child td { border-bottom:none; }
+.standing-table tr:hover td { background:rgba(255,255,255,.02); }
+.st-rank {
+  font-family:'JetBrains Mono', monospace;
+  font-size:11px; color:var(--muted); width:24px;
+}
+.st-team { font-weight:500; color:#fff; }
+.st-pts  { font-family:'Bebas Neue', sans-serif; font-size:16px; color:var(--pitch); }
+
+/* ═══════════ RESPONSIVE ═══════════ */
+@media(max-width:860px){
+  .page { grid-template-columns:1fr; padding:16px; }
+  .sidebar { display:none; }
+  header { padding:0 16px; }
+  .hero  { padding:40px 16px 36px; }
+}
+</style>
 </head>
 <body>
 
 <!-- HEADER -->
 <header>
-  <div class="logo">KICK<em>OFF</em></div>
-  <nav>
+  <div class="logo">KICK<em>OFF</em><div class="logo-dot"></div></div>
+  <div class="nav">
     <button class="nav-btn active" onclick="showSection('matches',this)">Matches</button>
     <button class="nav-btn"        onclick="showSection('players',this)">Players</button>
-  </nav>
-  <div class="live-pill"><div class="pulse-dot"></div> LIVE</div>
+    <button class="nav-btn"        onclick="showSection('standings',this)">Standings</button>
+  </div>
+  <div class="header-right">
+    <div class="api-badge" id="apiStatus">● CONNECTING</div>
+  </div>
 </header>
 
 <!-- HERO -->
 <div class="hero">
-  <div class="hero-eyebrow">⚽ Real-time football data</div>
-  <h1>YOUR <span>FOOTBALL</span><br>DASHBOARD</h1>
-  <p>Live scores, fixtures &amp; player stats — all powered by real football data.</p>
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+  <div class="hero-inner">
+    <div class="hero-eyebrow">Real-time football data</div>
+    <h1>LIVE<br><span class="green">FOOTBALL</span><br><span class="stroke">DASHBOARD</span></h1>
+    <p class="hero-sub">Scores, fixtures, standings &amp; player stats powered by free football APIs.</p>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-num" id="h-live">—<span></span></div>
+        <div class="hero-stat-lbl">Live Now</div>
+      </div>
+      <div class="hero-divider"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-num" id="h-today">—<span></span></div>
+        <div class="hero-stat-lbl">Today's Games</div>
+      </div>
+      <div class="hero-divider"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">5<span>+</span></div>
+        <div class="hero-stat-lbl">Top Leagues</div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- PAGE -->
@@ -362,50 +529,69 @@
   <main>
     <!-- Search -->
     <div class="search-section">
-      <div class="search-title">🔍 Search</div>
-      <div class="search-type-btns" style="margin-bottom:12px">
-        <button class="search-type-btn active" id="stBtn-players" onclick="setSearchType('players')">Players</button>
-        <button class="search-type-btn" id="stBtn-teams" onclick="setSearchType('teams')">Teams</button>
-        <button class="search-type-btn" id="stBtn-leagues" onclick="setSearchType('leagues')">Leagues</button>
+      <div class="search-label">// Search</div>
+      <div class="search-types">
+        <button class="stype-btn active" id="st-players" onclick="setSearchType('players')">Players</button>
+        <button class="stype-btn"        id="st-teams"   onclick="setSearchType('teams')">Teams</button>
+        <button class="stype-btn"        id="st-leagues" onclick="setSearchType('leagues')">Leagues</button>
       </div>
       <div class="search-row">
-        <div class="search-bar">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <div class="search-input-wrap">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
           </svg>
-          <input id="searchInput" type="text" placeholder="e.g. Mbappe, Salah, Haaland…"
+          <input id="searchInput" type="text" placeholder="e.g. Mbappé, Salah, Haaland…"
             oninput="onSearchInput(this.value)" onkeydown="if(event.key==='Enter') doSearch()"/>
         </div>
-        <button class="search-btn" onclick="doSearch()">Search</button>
+        <button class="search-go" onclick="doSearch()">Search</button>
       </div>
-      <div class="search-hint" id="searchHint">Search for players by name — powered by live API data</div>
     </div>
 
-    <!-- MATCHES -->
-    <div id="matchesSection">
+    <!-- MATCHES SECTION -->
+    <div id="sec-matches">
       <div class="tabs">
         <button class="tab active" onclick="loadMatches('live',this)">🔴 Live</button>
         <button class="tab"        onclick="loadMatches('today',this)">Today</button>
         <button class="tab"        onclick="loadMatches('upcoming',this)">Upcoming</button>
       </div>
-      <div class="section-hd" id="matchesHd">
-        Live Matches <span class="count-badge" id="matchCount">—</span>
+      <div class="section-hd">
+        <span id="matchesHdText">Live Matches</span>
+        <span class="count-pill" id="matchCount">—</span>
       </div>
       <div id="matchList">
-        <div class="loading"><div class="spinner"></div><span>Fetching matches…</span></div>
+        <div class="loading"><div class="spinner"></div><span>FETCHING MATCHES</span></div>
       </div>
     </div>
 
-    <!-- PLAYERS -->
-    <div id="playersSection" style="display:none">
+    <!-- PLAYERS SECTION -->
+    <div id="sec-players" style="display:none">
       <div class="section-hd">
-        Player Search <span class="count-badge" id="playerCount">—</span>
+        Player Search
+        <span class="count-pill" id="playerCount">—</span>
       </div>
       <div id="playerList">
         <div class="empty-state">
-          <div class="icon">🔍</div>
-          <p>Type a player name in the search bar above.</p>
+          <div class="empty-icon">🔍</div>
+          <p>Type a player name above and hit Search.</p>
         </div>
+      </div>
+    </div>
+
+    <!-- STANDINGS SECTION -->
+    <div id="sec-standings" style="display:none">
+      <div class="tabs" style="margin-bottom:20px">
+        <button class="tab active" onclick="loadStandings(39,'Premier League',this)">EPL</button>
+        <button class="tab"        onclick="loadStandings(140,'La Liga',this)">La Liga</button>
+        <button class="tab"        onclick="loadStandings(135,'Serie A',this)">Serie A</button>
+        <button class="tab"        onclick="loadStandings(78,'Bundesliga',this)">Bundesliga</button>
+        <button class="tab"        onclick="loadStandings(61,'Ligue 1',this)">Ligue 1</button>
+      </div>
+      <div class="section-hd">
+        <span id="standingsHdText">Standings</span>
+        <span class="count-pill" id="standingsCount">—</span>
+      </div>
+      <div id="standingsList">
+        <div class="loading"><div class="spinner"></div><span>FETCHING STANDINGS</span></div>
       </div>
     </div>
   </main>
@@ -413,348 +599,479 @@
   <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="sidebar-card">
-      <div class="sidebar-title">⚡ Dashboard</div>
+      <div class="sb-title">⚡ Live Stats</div>
       <div class="stat-row">
-        <span class="stat-label">Live Now</span>
+        <span class="stat-lbl">Live Matches</span>
         <span class="stat-val red" id="sb-live">—</span>
       </div>
       <div class="stat-row">
-        <span class="stat-label">Today's Games</span>
-        <span class="stat-val" id="sb-today">—</span>
+        <span class="stat-lbl">Today's Games</span>
+        <span class="stat-val amber" id="sb-today">—</span>
       </div>
       <div class="stat-row">
-        <span class="stat-label">API Status</span>
+        <span class="stat-lbl">API Status</span>
         <span class="stat-val" id="sb-status">Connecting…</span>
       </div>
+      <div class="stat-row">
+        <span class="stat-lbl">Data Source</span>
+        <span class="stat-val" style="font-size:10px">API-Football</span>
+      </div>
     </div>
+
     <div class="sidebar-card">
-      <div class="sidebar-title">🏆 Top Leagues</div>
-      <div class="stat-row"><span class="stat-label">Premier League</span><span class="stat-val">🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG</span></div>
-      <div class="stat-row"><span class="stat-label">La Liga</span><span class="stat-val">🇪🇸 ESP</span></div>
-      <div class="stat-row"><span class="stat-label">Bundesliga</span><span class="stat-val">🇩🇪 GER</span></div>
-      <div class="stat-row"><span class="stat-label">Serie A</span><span class="stat-val">🇮🇹 ITA</span></div>
-      <div class="stat-row"><span class="stat-label">Ligue 1</span><span class="stat-val">🇫🇷 FRA</span></div>
-      <div class="stat-row"><span class="stat-label">UCL</span><span class="stat-val">🌍 UEFA</span></div>
+      <div class="sb-title">🏆 Top Leagues</div>
+      <div class="league-row" onclick="switchToStandings(39,'Premier League')">
+        <span class="league-flag">🏴󠁧󠁢󠁥󠁮󠁧󠁿</span>
+        <span class="league-name">Premier League</span>
+        <span class="league-badge">ENG</span>
+      </div>
+      <div class="league-row" onclick="switchToStandings(140,'La Liga')">
+        <span class="league-flag">🇪🇸</span>
+        <span class="league-name">La Liga</span>
+        <span class="league-badge">ESP</span>
+      </div>
+      <div class="league-row" onclick="switchToStandings(135,'Serie A')">
+        <span class="league-flag">🇮🇹</span>
+        <span class="league-name">Serie A</span>
+        <span class="league-badge">ITA</span>
+      </div>
+      <div class="league-row" onclick="switchToStandings(78,'Bundesliga')">
+        <span class="league-flag">🇩🇪</span>
+        <span class="league-name">Bundesliga</span>
+        <span class="league-badge">GER</span>
+      </div>
+      <div class="league-row" onclick="switchToStandings(61,'Ligue 1')">
+        <span class="league-flag">🇫🇷</span>
+        <span class="league-name">Ligue 1</span>
+        <span class="league-badge">FRA</span>
+      </div>
+      <div class="league-row" onclick="switchToStandings(2,'Champions League')">
+        <span class="league-flag">🌍</span>
+        <span class="league-name">Champions League</span>
+        <span class="league-badge">UEFA</span>
+      </div>
     </div>
+
     <div class="sidebar-card">
-      <div class="sidebar-title">📋 How to Use</div>
-      <div class="stat-row"><span class="stat-label">Live tab</span><span class="stat-val" style="font-size:12px">Now playing</span></div>
-      <div class="stat-row"><span class="stat-label">Today tab</span><span class="stat-val" style="font-size:12px">All fixtures</span></div>
-      <div class="stat-row"><span class="stat-label">Search bar</span><span class="stat-val" style="font-size:12px">Find players</span></div>
+      <div class="sb-title">📖 Quick Guide</div>
+      <div class="stat-row">
+        <span class="stat-lbl">Live tab</span>
+        <span class="stat-val" style="font-size:11px">Now playing</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-lbl">Today tab</span>
+        <span class="stat-val" style="font-size:11px">All fixtures</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-lbl">Standings</span>
+        <span class="stat-val" style="font-size:11px">League tables</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-lbl">Search</span>
+        <span class="stat-val" style="font-size:11px">Players &amp; teams</span>
+      </div>
     </div>
   </aside>
 </div>
 
 <script>
-  const KEY  = '9c65929141msh57b509ec9b84d3bp12469cjsn92b02d92b5c6';
-  const HOST = 'free-api-live-football-data.p.rapidapi.com';
-  const BASE = `https://${HOST}`;
-  const HDRS = { 'x-rapidapi-key': KEY, 'x-rapidapi-host': HOST };
+/* ══════════════════════════════════════
+   API CONFIG
+   Uses API-Football (api-football.com) via RapidAPI — free plan: 100 req/day
+   ══════════════════════════════════════ */
+const RAPIDAPI_KEY  = '9c65929141msh57b509ec9b84d3bp12469cjsn92b02d92b5c6';
 
-  const q = id => document.getElementById(id);
-  let searchTimer = null;
+// ── Primary: api-football (sports fixtures + standings + players)
+const AF_HOST = 'api-football-v1.p.rapidapi.com';
+const AF_BASE = `https://${AF_HOST}/v3`;
+const AF_HDRS = { 'x-rapidapi-key': RAPIDAPI_KEY, 'x-rapidapi-host': AF_HOST };
 
-  function toArray(json) {
-    if (!json) return [];
-    if (Array.isArray(json))           return json;
-    if (Array.isArray(json.response))  return json.response;
-    if (Array.isArray(json.data))      return json.data;
-    if (Array.isArray(json.matches))   return json.matches;
-    if (Array.isArray(json.fixtures))  return json.fixtures;
-    if (Array.isArray(json.results))   return json.results;
-    const vals = Object.values(json).find(v => Array.isArray(v));
-    return vals || [];
-  }
+// ── Secondary: free-api-live-football-data (live matches, quick search)
+const FL_HOST = 'free-api-live-football-data.p.rapidapi.com';
+const FL_BASE = `https://${FL_HOST}`;
+const FL_HDRS = { 'x-rapidapi-key': RAPIDAPI_KEY, 'x-rapidapi-host': FL_HOST };
 
-  function setStatus(ok) {
-    const el = q('sb-status');
-    el.textContent = ok ? 'Connected ✓' : 'API Error';
-    el.className   = 'stat-val ' + (ok ? 'green' : 'red');
-  }
+// ── helpers
+const $ = id => document.getElementById(id);
+let searchType  = 'players';
+let searchTimer = null;
+const SEASON = 2024;
 
-  function showSection(sec, btn) {
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+function toArray(json) {
+  if (!json) return [];
+  if (Array.isArray(json))          return json;
+  if (Array.isArray(json.response)) return json.response;
+  if (Array.isArray(json.data))     return json.data;
+  if (Array.isArray(json.matches))  return json.matches;
+  if (Array.isArray(json.fixtures)) return json.fixtures;
+  const v = Object.values(json).find(x => Array.isArray(x));
+  return v || [];
+}
+
+function setApiStatus(ok) {
+  const el  = $('apiStatus');
+  const sb  = $('sb-status');
+  el.textContent = ok ? '● LIVE' : '● ERROR';
+  el.style.color = ok ? 'var(--pitch)' : 'var(--red)';
+  el.style.background = ok ? 'rgba(0,200,83,.1)' : 'rgba(255,51,51,.1)';
+  el.style.borderColor = ok ? 'rgba(0,200,83,.25)' : 'rgba(255,51,51,.25)';
+  sb.textContent  = ok ? 'Connected ✓' : 'API Error';
+  sb.className    = 'stat-val ' + (ok ? 'green' : 'red');
+}
+
+/* ══ SECTION NAV ══ */
+function showSection(sec, btn) {
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  ['matches','players','standings'].forEach(s => {
+    $('sec-'+s).style.display = s===sec ? 'block' : 'none';
+  });
+  if (sec==='standings') loadStandings(39, 'Premier League', document.querySelector('#sec-standings .tab'));
+}
+
+function switchToStandings(leagueId, name) {
+  const btn = document.querySelectorAll('.nav-btn')[2];
+  showSection('standings', btn);
+  const firstTab = document.querySelector('#sec-standings .tab');
+  loadStandings(leagueId, name, firstTab);
+}
+
+/* ══ MATCH LOADING ══ */
+async function loadMatches(type, btn) {
+  if (btn) {
+    document.querySelectorAll('#sec-matches .tab').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    q('matchesSection').style.display = sec === 'matches' ? 'block' : 'none';
-    q('playersSection').style.display = sec === 'players' ? 'block' : 'none';
   }
+  const labels = { live:'Live Matches', today:"Today's Matches", upcoming:'Upcoming Matches' };
+  $('matchesHdText').textContent = labels[type];
+  $('matchList').innerHTML = '<div class="loading"><div class="spinner"></div><span>FETCHING MATCHES</span></div>';
 
-  function setTabActive(btn) {
-    document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-  }
+  const eps = {
+    live:     '/football-get-all-live-matches-within-competition',
+    today:    '/football-current-day-matches-within-competition',
+    upcoming: '/football-upcoming-matches-within-competition'
+  };
 
-  async function loadMatches(type, btn) {
-    if (btn) setTabActive(btn);
-    const labels = { live:'Live Matches', today:"Today's Matches", upcoming:'Upcoming Matches' };
-    q('matchesHd').innerHTML = `${labels[type]} <span class="count-badge" id="matchCount">—</span>`;
-    q('matchList').innerHTML = '<div class="loading"><div class="spinner"></div><span>Fetching matches…</span></div>';
+  try {
+    const res = await fetch(FL_BASE + eps[type], { headers: FL_HDRS });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = await res.json();
+    setApiStatus(true);
 
-    const eps = {
-      live:     '/football-get-all-live-matches-within-competition',
-      today:    '/football-current-day-matches-within-competition',
-      upcoming: '/football-upcoming-matches-within-competition'
-    };
+    const matches = toArray(json);
+    $('matchCount').textContent = matches.length;
+    if (type==='live') { $('sb-live').textContent = matches.length||'0'; $('h-live').innerHTML=`${matches.length||0}<span></span>`; }
 
-    try {
-      const res = await fetch(BASE + eps[type], { headers: HDRS });
-      if (!res.ok) throw new Error(`HTTP ${res.status} — ${(await res.text()).slice(0,120)}`);
-      const json = await res.json();
-      setStatus(true);
-
-      const matches = toArray(json);
-      q('matchCount').textContent = matches.length;
-      if (type === 'live') q('sb-live').textContent = matches.length || '0';
-
-      if (matches.length === 0) {
-        q('matchList').innerHTML = `
-          <div class="empty-state">
-            <div class="icon">${type==='live'?'📺':'📅'}</div>
-            <p>No ${type} matches right now.<br>Try <strong>Today</strong> or <strong>Upcoming</strong>.</p>
-          </div>
-          <div class="demo-label">Sample Preview</div>${demoHTML(type)}`;
-        return;
-      }
-      q('matchList').innerHTML = matches.map((m,i) => matchCard(m,type,i)).join('');
-
-    } catch(err) {
-      setStatus(false);
-      q('matchList').innerHTML = `
-        <div class="error-msg">
-          ⚠️ <strong>Could not load matches.</strong><br>${err.message}<br><br>
-          <small>Check: API key active on RapidAPI · Free plan limit not exceeded (100 req/day) · Try refreshing.</small>
+    if (matches.length===0) {
+      $('matchList').innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">${type==='live'?'📺':'📅'}</div>
+          <p>No ${type} matches right now.<br>Try <strong>Today</strong> or <strong>Upcoming</strong>.</p>
         </div>
-        <div class="demo-label">Sample Preview</div>${demoHTML(type)}`;
+        <div class="demo-sep">Demo Preview</div>${demoMatches(type)}`;
+      return;
     }
+    $('matchList').innerHTML = matches.map((m,i) => matchCard(m,type,i)).join('');
+  } catch(err) {
+    setApiStatus(false);
+    $('matchList').innerHTML = `
+      <div class="error-box">⚠ <strong>Could not load matches.</strong><br>${err.message}<br><small>Check: API key is active on RapidAPI · Free plan (100 req/day) not exceeded · Try refreshing.</small></div>
+      <div class="demo-sep">Demo Preview</div>${demoMatches(type)}`;
   }
+}
 
-  function matchCard(m, type, i) {
-    const home      = m.home_name   || m.homeTeam?.name  || m.home?.name  || m.homeName  || m.team_home  || 'Home Team';
-    const away      = m.away_name   || m.awayTeam?.name  || m.away?.name  || m.awayName  || m.team_away  || 'Away Team';
-    const homeLogo  = m.home_image  || m.homeTeam?.logo  || m.home?.logo  || m.homeLogo  || '';
-    const awayLogo  = m.away_image  || m.awayTeam?.logo  || m.away?.logo  || m.awayLogo  || '';
-    const homeGoals = m.home_goals  ?? m.score?.home     ?? m.goals?.home ?? m.homeScore ?? (type==='upcoming'?'—':'0');
-    const awayGoals = m.away_goals  ?? m.score?.away     ?? m.goals?.away ?? m.awayScore ?? (type==='upcoming'?'—':'0');
-    const league    = m.competition_name || m.league?.name || m.competition?.name || m.leagueName || m.tournament || 'Football';
-    const leagueLogo= m.league?.logo || m.competition?.logo || '';
-    const minute    = m.minute || m.elapsed || m.time?.elapsed || '';
-    const kickoff   = m.time?.starting_at?.time || m.match_start || m.date_time || m.kickoff || 'TBD';
-    const isLive    = type === 'live';
+function matchCard(m, type, i) {
+  const home      = m.home_name   || m.homeTeam?.name  || m.home?.name  || 'Home';
+  const away      = m.away_name   || m.awayTeam?.name  || m.away?.name  || 'Away';
+  const homeLogo  = m.home_image  || m.homeTeam?.logo  || '';
+  const awayLogo  = m.away_image  || m.awayTeam?.logo  || '';
+  const hG        = m.home_goals  ?? m.score?.home     ?? (type==='upcoming'?null:'0');
+  const aG        = m.away_goals  ?? m.score?.away     ?? (type==='upcoming'?null:'0');
+  const league    = m.competition_name || m.league?.name || 'Football';
+  const leagueLogo= m.league?.logo || '';
+  const minute    = m.minute || m.elapsed || '';
+  const kickoff   = m.time?.starting_at?.time || m.match_start || m.kickoff || 'TBD';
+  const isLive    = type==='live';
+  const scoreStr  = (hG!==null && aG!==null) ? `${hG} — ${aG}` : 'vs';
 
-    const logo = (src, name) => src
-      ? `<img class="team-logo" src="${src}" onerror="this.outerHTML='<div class=team-logo-ph>${name.slice(0,2).toUpperCase()}</div>'" alt="${name}"/>`
-      : `<div class="team-logo-ph">${name.slice(0,2).toUpperCase()}</div>`;
+  const logoEl = (src, name) => src
+    ? `<img class="team-logo" src="${src}" onerror="this.outerHTML='<div class=team-logo-ph>${name.slice(0,2).toUpperCase()}</div>'" alt="${name}"/>`
+    : `<div class="team-logo-ph">${name.slice(0,2).toUpperCase()}</div>`;
 
-    return `
-      <div class="match-card ${isLive?'is-live':''}" style="animation-delay:${i*55}ms">
+  return `
+    <div class="match-card ${isLive?'is-live':''}" style="animation-delay:${i*50}ms">
+      <div class="card-meta">
         <div class="card-league">
-          ${leagueLogo?`<img src="${leagueLogo}" onerror="this.remove()" alt=""/>`:'<span>🏆</span>'}
-          ${league}
-          ${isLive?`<span class="live-tag"><span></span> LIVE</span>`:''}
+          ${leagueLogo?`<img src="${leagueLogo}" onerror="this.remove()" alt=""/>`:''} ${league}
         </div>
-        <div class="card-body">
-          <div class="team-block">
-            ${logo(homeLogo, home)}
-            <div class="team-name">${home}</div>
+        ${isLive?`<div class="live-chip"><div class="dot"></div>LIVE${minute?` ${minute}'`:''}</div>`:''}
+        ${type==='ft'?`<div style="font-size:10px;color:var(--muted2);font-family:'JetBrains Mono',monospace">FT</div>`:''}
+        ${type==='upcoming'?`<div style="font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace">${kickoff}</div>`:''}
+      </div>
+      <div class="card-body">
+        <div class="team-block">
+          ${logoEl(homeLogo,home)}
+          <div class="team-name">${home}</div>
+        </div>
+        <div class="score-box">
+          <div class="score ${isLive?'live':''}">${scoreStr}</div>
+          <div class="match-status ${isLive?'live':type==='upcoming'?'ns':'ft'}">
+            ${isLive?(minute?`${minute}'`:'LIVE'):type==='upcoming'?kickoff:'FT'}
           </div>
-          <div class="score-col">
-            <div class="score-num ${isLive?'live-score':''}">${homeGoals} — ${awayGoals}</div>
-            <div class="match-status ${isLive?'live':type==='upcoming'?'ns':'ft'}">
-              ${isLive?(minute?`${minute}'`:'LIVE'):type==='upcoming'?kickoff:'FT'}
+        </div>
+        <div class="team-block right">
+          ${logoEl(awayLogo,away)}
+          <div class="team-name">${away}</div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function demoMatches(type) {
+  return [
+    { home_name:'Manchester City', away_name:'Arsenal',           home_goals:2, away_goals:1, competition_name:'Premier League',  minute:67 },
+    { home_name:'Real Madrid',     away_name:'Barcelona',         home_goals:1, away_goals:1, competition_name:'La Liga',         minute:45 },
+    { home_name:'Bayern Munich',   away_name:'Borussia Dortmund', home_goals:3, away_goals:0, competition_name:'Bundesliga',      minute:80 },
+    { home_name:'PSG',             away_name:'Lyon',              home_goals:0, away_goals:2, competition_name:'Ligue 1',         minute:90 },
+    { home_name:'Inter Milan',     away_name:'AC Milan',          home_goals:1, away_goals:0, competition_name:'Serie A',         minute:55 },
+  ].map((m,i)=>matchCard(m,type,i)).join('');
+}
+
+/* ══ SEARCH ══ */
+function setSearchType(type) {
+  searchType = type;
+  document.querySelectorAll('.stype-btn').forEach(b=>b.classList.remove('active'));
+  $('st-'+type).classList.add('active');
+  const ph = { players:'e.g. Mbappé, Salah, Haaland…', teams:'e.g. Arsenal, Barcelona, Bayern…', leagues:'e.g. Premier League, La Liga…' };
+  $('searchInput').placeholder = ph[type];
+  $('playerList').innerHTML = `<div class="empty-state"><div class="empty-icon">🔍</div><p>Type a name and press Search.</p></div>`;
+}
+
+function onSearchInput(val) {
+  clearTimeout(searchTimer);
+  if (val.length>=3) searchTimer = setTimeout(()=>doSearch(), 700);
+}
+
+function doSearch() {
+  const val = $('searchInput').value.trim();
+  if (!val) return;
+  showSection('players', document.querySelectorAll('.nav-btn')[1]);
+  if (searchType==='players') searchPlayers(val);
+  else if (searchType==='teams') searchTeams(val);
+  else searchLeagues(val);
+}
+
+async function searchPlayers(query) {
+  $('playerList').innerHTML = '<div class="loading"><div class="spinner"></div><span>SEARCHING PLAYERS</span></div>';
+  try {
+    // Try API-Football first (richer data)
+    const res = await fetch(`${AF_BASE}/players?search=${encodeURIComponent(query)}&season=${SEASON}`, { headers: AF_HDRS });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = await res.json();
+    const items = toArray(json);
+    $('playerCount').textContent = items.length;
+
+    if (items.length===0) {
+      $('playerList').innerHTML = `<div class="empty-state"><div class="empty-icon">😕</div><p>No players found for "<strong>${query}</strong>".</p></div>`;
+      return;
+    }
+
+    $('playerList').innerHTML = items.slice(0,20).map((item,i) => {
+      const p      = item.player || item;
+      const stats  = (item.statistics||[])[0] || {};
+      const name   = p.name || `${p.firstname||''} ${p.lastname||''}`.trim() || 'Unknown';
+      const team   = stats.team?.name || p.club || '—';
+      const pos    = stats.games?.position || p.position || '—';
+      const nation = p.nationality || '';
+      const age    = p.age ? `${p.age}y` : '';
+      const photo  = p.photo || '';
+      const init   = name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+      const goals  = stats.goals?.total;
+      const apps   = stats.games?.appearences;
+      return `
+        <div class="player-card" style="animation-delay:${i*40}ms">
+          <div class="avatar">
+            ${photo?`<img src="${photo}" onerror="this.style.display='none';this.parentNode.textContent='${init}'" alt="${name}"/>`:init}
+          </div>
+          <div style="flex:1;min-width:0">
+            <div class="player-name">${name}</div>
+            <div class="player-meta">
+              <span>⚽ ${team}</span>
+              ${nation?`<span>🌍 ${nation}</span>`:''}
+              ${age?`<span>📅 ${age}</span>`:''}
+              ${goals!=null?`<span>🎯 ${goals} goals</span>`:''}
+              ${apps!=null?`<span>📊 ${apps} apps</span>`:''}
             </div>
           </div>
-          <div class="team-block right">
-            ${logo(awayLogo, away)}
-            <div class="team-name">${away}</div>
+          <div class="pos-tag">${pos}</div>
+        </div>`;
+    }).join('');
+  } catch(err) {
+    // Fallback to free-football API
+    try {
+      const res2 = await fetch(`${FL_BASE}/football-players-search?search=${encodeURIComponent(query)}`, { headers: FL_HDRS });
+      const json2 = await res2.json();
+      const players = toArray(json2);
+      $('playerCount').textContent = players.length;
+      if (players.length===0) { $('playerList').innerHTML=`<div class="empty-state"><div class="empty-icon">😕</div><p>No results for "<strong>${query}</strong>".</p></div>`; return; }
+      $('playerList').innerHTML = players.slice(0,20).map((p,i)=>{
+        const name = p.name||`${p.firstname||''} ${p.lastname||''}`.trim()||'Unknown';
+        const team = p.team?.name||p.club||'—';
+        const pos  = p.position||'—';
+        const init = name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+        return `<div class="player-card" style="animation-delay:${i*40}ms"><div class="avatar">${init}</div><div style="flex:1;min-width:0"><div class="player-name">${name}</div><div class="player-meta"><span>⚽ ${team}</span></div></div><div class="pos-tag">${pos}</div></div>`;
+      }).join('');
+    } catch(e2) {
+      $('playerList').innerHTML=`<div class="error-box">⚠ Player search failed: ${err.message}</div>`;
+    }
+  }
+}
+
+async function searchTeams(query) {
+  $('playerList').innerHTML = '<div class="loading"><div class="spinner"></div><span>SEARCHING TEAMS</span></div>';
+  try {
+    const res = await fetch(`${AF_BASE}/teams?search=${encodeURIComponent(query)}`, { headers: AF_HDRS });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = await res.json();
+    const items = toArray(json);
+    $('playerCount').textContent = items.length;
+    if (items.length===0) { $('playerList').innerHTML=`<div class="empty-state"><div class="empty-icon">🏟️</div><p>No teams found for "<strong>${query}</strong>".</p></div>`; return; }
+    $('playerList').innerHTML = items.slice(0,20).map((item,i)=>{
+      const t    = item.team || item;
+      const v    = item.venue || {};
+      const name = t.name||'Unknown';
+      const init = name.slice(0,2).toUpperCase();
+      const logo = t.logo||'';
+      return `
+        <div class="player-card" style="animation-delay:${i*40}ms">
+          <div class="avatar" style="border-radius:8px">
+            ${logo?`<img src="${logo}" onerror="this.style.display='none';this.parentNode.textContent='${init}'" alt="${name}" style="border-radius:8px"/>`:init}
           </div>
-        </div>
+          <div style="flex:1;min-width:0">
+            <div class="player-name">${name}</div>
+            <div class="player-meta">
+              ${t.country?`<span>🌍 ${t.country}</span>`:''}
+              ${t.founded?`<span>📅 Est. ${t.founded}</span>`:''}
+              ${v.name?`<span>🏟 ${v.name}</span>`:''}
+            </div>
+          </div>
+          <div class="pos-tag">CLUB</div>
+        </div>`;
+    }).join('');
+  } catch(err) {
+    $('playerList').innerHTML=`<div class="error-box">⚠ Team search failed: ${err.message}</div>`;
+  }
+}
+
+async function searchLeagues(query) {
+  $('playerList').innerHTML = '<div class="loading"><div class="spinner"></div><span>SEARCHING LEAGUES</span></div>';
+  try {
+    const res = await fetch(`${AF_BASE}/leagues?search=${encodeURIComponent(query)}`, { headers: AF_HDRS });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = await res.json();
+    const items = toArray(json);
+    $('playerCount').textContent = items.length;
+    if (items.length===0) { $('playerList').innerHTML=`<div class="empty-state"><div class="empty-icon">🏆</div><p>No leagues found for "<strong>${query}</strong>".</p></div>`; return; }
+    $('playerList').innerHTML = items.slice(0,20).map((item,i)=>{
+      const l    = item.league || item;
+      const ctr  = item.country || {};
+      const name = l.name||'Unknown';
+      const init = name.slice(0,2).toUpperCase();
+      const logo = l.logo||'';
+      return `
+        <div class="player-card" style="animation-delay:${i*40}ms">
+          <div class="avatar" style="border-radius:8px">
+            ${logo?`<img src="${logo}" onerror="this.style.display='none';this.parentNode.textContent='${init}'" alt="${name}" style="border-radius:8px"/>`:init}
+          </div>
+          <div style="flex:1;min-width:0">
+            <div class="player-name">${name}</div>
+            <div class="player-meta">
+              ${ctr.name?`<span>🌍 ${ctr.name}</span>`:''}
+              ${l.type?`<span>📋 ${l.type}</span>`:''}
+            </div>
+          </div>
+          <div class="pos-tag">LEAGUE</div>
+        </div>`;
+    }).join('');
+  } catch(err) {
+    $('playerList').innerHTML=`<div class="error-box">⚠ League search failed: ${err.message}</div>`;
+  }
+}
+
+/* ══ STANDINGS ══ */
+async function loadStandings(leagueId, name, btn) {
+  if (btn) {
+    document.querySelectorAll('#sec-standings .tab').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+  $('standingsHdText').textContent = name + ' — ' + SEASON;
+  $('standingsList').innerHTML = '<div class="loading"><div class="spinner"></div><span>FETCHING STANDINGS</span></div>';
+  try {
+    const res = await fetch(`${AF_BASE}/standings?league=${leagueId}&season=${SEASON}`, { headers: AF_HDRS });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = await res.json();
+    const resp = (json.response||[])[0];
+    const league = resp?.league;
+    const standing = league?.standings?.[0] || [];
+    $('standingsCount').textContent = standing.length + ' teams';
+
+    if (standing.length===0) {
+      $('standingsList').innerHTML=`<div class="empty-state"><div class="empty-icon">📋</div><p>No standings data available.</p></div>`;
+      return;
+    }
+
+    $('standingsList').innerHTML = `
+      <div style="overflow-x:auto;">
+        <table class="standing-table">
+          <thead>
+            <tr>
+              <th>#</th><th style="text-align:left">Team</th>
+              <th>MP</th><th>W</th><th>D</th><th>L</th>
+              <th>GF</th><th>GA</th><th>GD</th><th>Pts</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${standing.map((row,i)=>{
+              const t = row.team;
+              return `<tr style="animation:fadeUp .3s ease ${i*25}ms both">
+                <td class="st-rank">${row.rank}</td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:8px">
+                    ${t.logo?`<img src="${t.logo}" width="18" height="18" style="border-radius:3px;object-fit:contain" onerror="this.remove()" alt=""/>`:''}
+                    <span class="st-team">${t.name}</span>
+                  </div>
+                </td>
+                <td style="color:var(--muted)">${row.all.played}</td>
+                <td style="color:var(--pitch)">${row.all.win}</td>
+                <td style="color:var(--muted)">${row.all.draw}</td>
+                <td style="color:var(--red)">${row.all.lose}</td>
+                <td style="color:var(--muted)">${row.all.goals.for}</td>
+                <td style="color:var(--muted)">${row.all.goals.against}</td>
+                <td style="color:var(--muted2)">${row.goalsDiff}</td>
+                <td class="st-pts">${row.points}</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
       </div>`;
+  } catch(err) {
+    $('standingsList').innerHTML=`<div class="error-box">⚠ Standings failed: ${err.message}<br><small>API-Football free plan: 100 req/day. Check your RapidAPI quota.</small></div>`;
   }
+}
 
-  function demoHTML(type) {
-    return [
-      { home_name:'Manchester City',   away_name:'Arsenal',           home_goals:2, away_goals:1, competition_name:'Premier League',  minute:67 },
-      { home_name:'Real Madrid',       away_name:'Barcelona',         home_goals:1, away_goals:1, competition_name:'La Liga',         minute:45 },
-      { home_name:'Bayern Munich',     away_name:'Borussia Dortmund', home_goals:3, away_goals:0, competition_name:'Bundesliga',      minute:80 },
-      { home_name:'PSG',               away_name:'Lyon',              home_goals:0, away_goals:2, competition_name:'Ligue 1',         minute:90 },
-      { home_name:'Inter Milan',       away_name:'AC Milan',          home_goals:1, away_goals:0, competition_name:'Serie A',         minute:55 },
-    ].map((m,i) => matchCard(m, type, i)).join('');
-  }
-
-  let searchTimer = null;
-  let searchType  = 'players';
-
-  function setSearchType(type) {
-    searchType = type;
-    document.querySelectorAll('.search-type-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('stBtn-' + type).classList.add('active');
-    const hints = {
-      players: 'Search for players by name — e.g. Mbappe, Salah, Haaland',
-      teams:   'Search for clubs by name — e.g. Arsenal, Barcelona, Bayern',
-      leagues: 'Search for leagues — e.g. Premier League, La Liga, Serie A'
-    };
-    document.getElementById('searchHint').textContent = hints[type];
-    document.getElementById('searchInput').placeholder =
-      type === 'players' ? 'e.g. Mbappe, Salah, Haaland…' :
-      type === 'teams'   ? 'e.g. Arsenal, Barcelona, Bayern…' :
-                           'e.g. Premier League, La Liga…';
-    q('playerList').innerHTML = `<div class="empty-state"><div class="icon">🔍</div><p>Type a name and press Search.</p></div>`;
-  }
-
-  function onSearchInput(val) {
-    clearTimeout(searchTimer);
-    if (val.length >= 3) searchTimer = setTimeout(() => doSearch(), 700);
-  }
-
-  function doSearch() {
-    const val = document.getElementById('searchInput').value.trim();
-    if (!val) return;
-    showSection('players', document.querySelectorAll('.nav-btn')[1]);
-    if (searchType === 'players') searchPlayers(val);
-    else if (searchType === 'teams') searchTeams(val);
-    else searchLeagues(val);
-  }
-
-  function handleSearch(val) {
-    clearTimeout(searchTimer);
-    if (val.length < 2) return;
-    searchTimer = setTimeout(() => doSearch(), 500);
-  }
-
-  async function searchPlayers(query) {
-    q('playerList').innerHTML = '<div class="loading"><div class="spinner"></div><span>Searching players…</span></div>';
-    try {
-      const res = await fetch(`${BASE}/football-players-search?search=${encodeURIComponent(query)}`, { headers: HDRS });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const json = await res.json();
-      const players = toArray(json);
-      q('playerCount').textContent = players.length;
-
-      if (players.length === 0) {
-        q('playerList').innerHTML = `<div class="empty-state"><div class="icon">😕</div><p>No players found for "<strong>${query}</strong>".<br>Try a different spelling.</p></div>`;
-        return;
-      }
-
-      q('playerList').innerHTML = `<div class="section-hd">Players <span class="count-badge">${players.length}</span></div>` +
-        players.slice(0,20).map((p,i) => {
-          const name     = p.name || p.fullname || `${p.firstname||''} ${p.lastname||''}`.trim() || 'Unknown';
-          const team     = p.team?.name || p.club || p.current_team || p.teamName || '—';
-          const pos      = p.position || p.player_position || '—';
-          const nation   = p.nationality || p.country || '';
-          const photo    = p.photo || p.image || p.player_image || '';
-          const initials = name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
-          return `
-            <div class="player-card" style="animation-delay:${i*45}ms">
-              <div class="player-avatar">
-                ${photo?`<img src="${photo}" onerror="this.style.display='none';this.parentNode.textContent='${initials}'" alt="${name}"/>`:initials}
-              </div>
-              <div style="flex:1;min-width:0">
-                <div class="player-name">${name}</div>
-                <div class="player-meta">
-                  <span>⚽ ${team}</span>
-                  ${nation?`<span>🌍 ${nation}</span>`:''}
-                </div>
-              </div>
-              <div class="pos-tag">${pos}</div>
-            </div>`;
-        }).join('');
-    } catch(err) {
-      q('playerList').innerHTML = `<div class="error-msg">⚠️ Player search failed: ${err.message}</div>`;
-    }
-  }
-
-  async function searchTeams(query) {
-    q('playerList').innerHTML = '<div class="loading"><div class="spinner"></div><span>Searching teams…</span></div>';
-    try {
-      const res = await fetch(`${BASE}/football-team-search?search=${encodeURIComponent(query)}`, { headers: HDRS });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const json = await res.json();
-      const teams = toArray(json);
-      q('playerCount').textContent = teams.length;
-
-      if (teams.length === 0) {
-        q('playerList').innerHTML = `<div class="empty-state"><div class="icon">🏟️</div><p>No teams found for "<strong>${query}</strong>".</p></div>`;
-        return;
-      }
-
-      q('playerList').innerHTML = `<div class="section-hd">Teams <span class="count-badge">${teams.length}</span></div>` +
-        teams.slice(0,20).map((t,i) => {
-          const name    = t.name || t.team_name || t.teamName || 'Unknown';
-          const country = t.country || t.nation || '';
-          const league  = t.league?.name || t.competition || '';
-          const logo    = t.logo || t.image || t.crest || '';
-          const initials = name.slice(0,2).toUpperCase();
-          return `
-            <div class="player-card" style="animation-delay:${i*45}ms">
-              <div class="player-avatar" style="border-radius:8px">
-                ${logo ? `<img src="${logo}" onerror="this.style.display='none';this.parentNode.textContent='${initials}'" alt="${name}" style="border-radius:6px"/>` : initials}
-              </div>
-              <div style="flex:1;min-width:0">
-                <div class="player-name">${name}</div>
-                <div class="player-meta">
-                  ${country ? `<span>🌍 ${country}</span>` : ''}
-                  ${league  ? `<span>🏆 ${league}</span>`  : ''}
-                </div>
-              </div>
-              <div class="pos-tag">CLUB</div>
-            </div>`;
-        }).join('');
-    } catch(err) {
-      q('playerList').innerHTML = `<div class="error-msg">⚠️ Team search failed: ${err.message}<br><small>This endpoint may not be available on your API plan.</small></div>`;
-    }
-  }
-
-  async function searchLeagues(query) {
-    q('playerList').innerHTML = '<div class="loading"><div class="spinner"></div><span>Searching leagues…</span></div>';
-    try {
-      const res = await fetch(`${BASE}/football-league-search?search=${encodeURIComponent(query)}`, { headers: HDRS });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const json = await res.json();
-      const leagues = toArray(json);
-      q('playerCount').textContent = leagues.length;
-
-      if (leagues.length === 0) {
-        q('playerList').innerHTML = `<div class="empty-state"><div class="icon">🏆</div><p>No leagues found for "<strong>${query}</strong>".</p></div>`;
-        return;
-      }
-
-      q('playerList').innerHTML = `<div class="section-hd">Leagues <span class="count-badge">${leagues.length}</span></div>` +
-        leagues.slice(0,20).map((l,i) => {
-          const name    = l.name || l.league_name || l.leagueName || 'Unknown';
-          const country = l.country || l.nation || '';
-          const season  = l.season || l.current_season || '';
-          const logo    = l.logo || l.image || l.badge || '';
-          const initials = name.slice(0,2).toUpperCase();
-          return `
-            <div class="player-card" style="animation-delay:${i*45}ms">
-              <div class="player-avatar" style="border-radius:8px">
-                ${logo ? `<img src="${logo}" onerror="this.style.display='none';this.parentNode.textContent='${initials}'" alt="${name}" style="border-radius:6px"/>` : initials}
-              </div>
-              <div style="flex:1;min-width:0">
-                <div class="player-name">${name}</div>
-                <div class="player-meta">
-                  ${country ? `<span>🌍 ${country}</span>` : ''}
-                  ${season  ? `<span>📅 ${season}</span>`  : ''}
-                </div>
-              </div>
-              <div class="pos-tag">LEAGUE</div>
-            </div>`;
-        }).join('');
-    } catch(err) {
-      q('playerList').innerHTML = `<div class="error-msg">⚠️ League search failed: ${err.message}<br><small>This endpoint may not be available on your API plan.</small></div>`;
-    }
-  }
-
-  async function loadTodayCount() {
-    try {
-      const res  = await fetch(`${BASE}/football-current-day-matches-within-competition`, { headers: HDRS });
-      const json = await res.json();
-      q('sb-today').textContent = toArray(json).length || '—';
-    } catch { q('sb-today').textContent = '—'; }
-  }
-
-  loadMatches('live', document.querySelector('.tab.active'));
-  loadTodayCount();
+/* ══ INIT ══ */
+async function init() {
+  loadMatches('live', document.querySelector('#sec-matches .tab'));
+  // Load today count
+  try {
+    const res  = await fetch(`${FL_BASE}/football-current-day-matches-within-competition`, { headers: FL_HDRS });
+    const json = await res.json();
+    const cnt  = toArray(json).length;
+    $('sb-today').textContent = cnt||'—';
+    $('h-today').innerHTML = `${cnt||'—'}<span></span>`;
+  } catch { $('sb-today').textContent='—'; }
+}
+init();
 </script>
 </body>
 </html>
